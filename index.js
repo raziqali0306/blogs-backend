@@ -16,7 +16,7 @@ mongoose.connect(process.env.MONGO_URI)
     console.log('mongodb connected');
 })
 .then(() => {
-    app.listen(5000, () => {
-        console.log('server started at PORT 5000')
+    app.listen(process.env.PORT || 3000, () => {
+        console.log('server started at PORT 3000')
     })
 })
