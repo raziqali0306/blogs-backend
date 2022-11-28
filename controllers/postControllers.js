@@ -1,4 +1,5 @@
 const Post = require('../models/post');
+const { sortByFrequency } = require('../utils/utils');
 
 const getPosts = async (req, res) => {
     Post.find({}, (err, data) => {
@@ -72,10 +73,37 @@ const deletePost = (req, res) => {
     })
 }
 
+const tags = (req, res) => {
+    Post.find({}, (err, posts) => {
+        if (err || posts === null) {
+            res.status(500).send(err);
+        }
+        else {
+            let tags = []; 
+            let map = {}
+            posts.forEach(post => {
+                post.tags.forEach((tag) => {
+                    tags.push(tag);
+                    if (map[tag]) {
+                        map[tag]++;
+                    }
+                    else {
+                        map[tag] = 1;
+                    }
+                })
+            });
+            tags = sortByFrequency(tags);
+            tags.length = tags.length < 11 ? tags.length : 11;
+            res.status(200).json(tags);
+        }
+    })
+}
+
 module.exports = {
     getPosts,
     getPostById,
     createPost,
     updatePost,
-    deletePost
+    deletePost,
+    tags
 }
