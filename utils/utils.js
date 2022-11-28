@@ -1,4 +1,4 @@
-export function sortByFrequency(array) {
+const sortByFrequency = (array) => {
     var frequency = {};
 
     array.forEach(function(value) { frequency[value] = 0; });
@@ -10,4 +10,8 @@ export function sortByFrequency(array) {
     return uniques.sort(function(a, b) {
         return frequency[b] - frequency[a];
     });
+}
+
+module.exports = {
+    sortByFrequency
 }
