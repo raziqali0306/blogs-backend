@@ -29,14 +29,15 @@ const createPost = async (req, res) => {
         postId: nanoid(),
         title: req.body.title,
         body: req.body.body,
-        tags: req.body.tags
+        tags: req.body.tags,
+        author: req.body.author
     })
     post.save()
         .then((data) => {
             res.status(200).json({
                 status: "success",
                 data: data
-        })
+            })
         })
         .catch((err) => {
             res.status(500).json(err)
@@ -62,13 +63,15 @@ const updatePost = (req, res) => {
 
 
 const deletePost = (req, res) => {
-    Post.findOneAndDelete({ postId: req.params.id }, (err, data) => {
-        if (err || data === null) {
-            if(data === null) res.status(400).json("invalid postId")
-            res.status(500).send(err);
+    Post.findOneAndDelete({ postId: req.params.id }, (error, data) => {
+        if (error || data === null) {
+            res.status(404).json({
+                message: "failed",
+                error
+            });
         }
         else {
-            res.status(200).send(data);
+            res.status(200).json(data);
         }
     })
 }
