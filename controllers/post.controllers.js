@@ -1,4 +1,4 @@
-const Post = require('../models/post');
+const Post = require('../models/Post.model');
 const { sortByFrequency } = require('../utils/utils');
 
 const getPosts = async (req, res) => {

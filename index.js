@@ -1,22 +1,20 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const dotenv = require('dotenv')
+const { connectDB } = require('./lib/mongodb')
 
-app = express()
+require('dotenv').config()
 
-dotenv.config()
-app.use(express.json())
+app = require('express')()
+app.use(require('express').json())
 app.use(require('cors')())
 app.use(require('morgan')('dev'))
-app.use('/posts', require('./routes/postRoutes'));
 
+app.use('/api/posts', require('./routes/posts.routes'));
+app.use('/api/auth', require('./routes/auth.routes'));
 
-mongoose.connect(process.env.MONGO_URI)
-.then(() => {
-    console.log('mongodb connected');
-})
-.then(() => {
-    app.listen(process.env.PORT || 3000, () => {
-        console.log('server started at PORT 3000')
+connectDB()
+    .then(() => {
+        console.log('mongodb connected');
+
+        app.listen(process.env.PORT || 3000, () => {
+            console.log('server started at PORT 3000')
+        })
     })
-})
