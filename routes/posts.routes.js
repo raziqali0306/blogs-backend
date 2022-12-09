@@ -4,7 +4,7 @@ const { verify } = require('../middleware/auth.middlewares');
 
 router.route('/').get(getPosts).post(createPost);
 router.route('/tags').get(tags);
-router.route('/myblogs').get(verify, getUserBlogs);
+router.route('/myposts').post(verify, getUserBlogs);
 router.route('/:id').get(getPostById).patch(verify, updatePost).delete(verify, deletePost);
 
 module.exports = router;
