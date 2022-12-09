@@ -1,5 +1,6 @@
 const Post = require('../models/Post.model');
 const { sortByFrequency } = require('../utils/utils');
+const mongoose = require("mongoose");
 
 const getPosts = async (req, res) => {
     Post.find({}, (err, data) => {
@@ -30,7 +31,7 @@ const createPost = async (req, res) => {
         title: req.body.title,
         body: req.body.body,
         tags: req.body.tags,
-        author: req.body.author
+        author: mongoose.Types.ObjectId(req.body.author)
     })
     post.save()
         .then((data) => {
@@ -45,26 +46,43 @@ const createPost = async (req, res) => {
 }
 
 const updatePost = (req, res) => {
-    Post.findOneAndUpdate({ postId: req.params.id },
+    Post.findOneAndUpdate({ postId: req.params.id, author: mongoose.Types.ObjectId(req.user.author) },
         { $set: req.body },
-        (err, data) => {
-            if (err || data === null) {
-            if(data === null) res.status(400).json("invalid request")
-            res.status(500).json(err);
+        (error, data) => {
+            if (error || data === null) {
+                if (data === null) {
+                    res.status(401).json({
+                        message: "failed",
+                        error: "unauthorized"
+                    });
+                    return;
+                }
+                res.status(500).json({
+                    message: "failed",
+                    error
+                });
+            }
+            else {
+                res.status(200).json({
+                    "status": "ok",
+                    data: data
+                });
+            }
         }
-        else {
-            res.status(200).json({
-                "status": "ok",
-                data: data
-            });
-        }
-    })
-}
-
-
-const deletePost = (req, res) => {
-    Post.findOneAndDelete({ postId: req.params.id }, (error, data) => {
-        if (error || data === null) {
+        )
+    }
+    
+    
+    const deletePost = (req, res) => {
+        Post.findOneAndDelete({ postId: req.params.id, author: mongoose.Types.ObjectId(req.user.author) }, (error, data) => {
+            if (error || data === null) {
+                if (data === null) {
+                    res.status(401).json({
+                        message: "failed",
+                        error: "unauthorized"
+                    });
+                    return;
+                }
             res.status(404).json({
                 message: "failed",
                 error

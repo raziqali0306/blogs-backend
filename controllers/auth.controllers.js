@@ -15,21 +15,27 @@ const register = async (req, res) => {
                 data: user
             })
         })
-        .catch((err) => {
-            res.status(500).json("failed");
+        .catch((error) => {
+            res.status(500).json({
+                message: "failed",
+                error
+            });
         })
 }
     
 const login = (req, res) => {
     // TODO
     const { email, username, password } = req.body;
-    User.findOne({ $or: [{ email }, { username }] }, async (err, data) => {
-        if (err) {
-            res.status(500).json("failed")
+    User.findOne({ $or: [{ email }, { username }] }, async (error, data) => {
+        if (error) {
+            res.status(500).json({
+                message: "failed",
+                error
+            })
         }
-        const { username, email } = data;
+        const { username, email, _id } = data;
         if (await verify(data.password, password)) {
-            let token = jwt.sign({ username, email }, process.env.JWT_SECRETE_KEY);
+            let token = jwt.sign({ username, email, author: _id }, process.env.JWT_SECRETE_KEY);
             res.status(200).json({
                 message: "success",
                 data: {...data._doc, access_token: token}
