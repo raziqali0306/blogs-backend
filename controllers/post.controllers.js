@@ -24,6 +24,23 @@ const getPostById = (req, res) => {
     })
 }
 
+const getUserBlogs = (req, res) => {
+    Post.find({ author: mongoose.Types.ObjectId(req.user.author) }, (error, data) => {
+        if (error) {
+            res.status(500).json({
+                message: "failed",
+                error
+            })
+        }
+        else {
+            res.status(200).json({
+                message: "success",
+                data
+            })
+        }
+    })
+}
+
 const createPost = async (req, res) => {
     const { nanoid } = await import('nanoid');
     const post = new Post({
@@ -34,15 +51,15 @@ const createPost = async (req, res) => {
         author: mongoose.Types.ObjectId(req.body.author)
     })
     post.save()
-        .then((data) => {
-            res.status(200).json({
-                status: "success",
-                data: data
-            })
+    .then((data) => {
+        res.status(200).json({
+            status: "success",
+            data: data
         })
-        .catch((err) => {
-            res.status(500).json(err)
-        })
+    })
+    .catch((err) => {
+        res.status(500).json(err)
+    })
 }
 
 const updatePost = (req, res) => {
@@ -69,20 +86,20 @@ const updatePost = (req, res) => {
                 });
             }
         }
-        )
-    }
+    )
+}
     
     
-    const deletePost = (req, res) => {
-        Post.findOneAndDelete({ postId: req.params.id, author: mongoose.Types.ObjectId(req.user.author) }, (error, data) => {
-            if (error || data === null) {
-                if (data === null) {
-                    res.status(401).json({
-                        message: "failed",
-                        error: "unauthorized"
-                    });
-                    return;
-                }
+const deletePost = (req, res) => {
+    Post.findOneAndDelete({ postId: req.params.id, author: mongoose.Types.ObjectId(req.user.author) }, (error, data) => {
+        if (error || data === null) {
+            if (data === null) {
+                res.status(401).json({
+                    message: "failed",
+                    error: "unauthorized"
+                });
+                return;
+            }
             res.status(404).json({
                 message: "failed",
                 error
@@ -120,11 +137,13 @@ const tags = (req, res) => {
     })
 }
 
+
 module.exports = {
     getPosts,
     getPostById,
     createPost,
     updatePost,
     deletePost,
-    tags
+    tags,
+    getUserBlogs
 }
